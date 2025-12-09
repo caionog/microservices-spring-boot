@@ -1,9 +1,0 @@
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/AccountController.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/AccountDAO.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/AccountApplication.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/IAccountRepository.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/AccountDTO.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/AccountCollection.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/Account.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/model/account/AccountJPARepository.java
-/Users/albertins/workspaceMicroservices/service-account/src/main/java/br/ufpe/cin/qualiti/banking/communication/AccountMVCController.java

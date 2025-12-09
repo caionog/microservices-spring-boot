@@ -1,5 +1,4 @@
 
-version: "3"
 services:
     account:
         build:
@@ -9,6 +8,16 @@ services:
     transaction:
         build:
             context: ./4-transaction-service-gateway/
+        depends_on:
+             - discovery
+    patients:
+        build:
+            context: ./4-patients-service-gateway/
+        depends_on:
+             - discovery
+    doctors:
+        build:
+            context: ./4-doctors-service-gateway/
         depends_on:
              - discovery
     discovery:

@@ -14,3 +14,16 @@ spring:
                   uri: lb://transaction
                   predicates:
                     - Path=/transaction/**
+                - id: patients
+                  uri: lb://patients
+                  predicates:
+                    - Path=/patients/**
+                - id: doctors
+                  uri: lb://doctors
+                  predicates:
+                    - Path=/doctors/**
+
+eureka:
+    client:
+        service-url:
+            defaultZone: http://discovery:8761/eureka/

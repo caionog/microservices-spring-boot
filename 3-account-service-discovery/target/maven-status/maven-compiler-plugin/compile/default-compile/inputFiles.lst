@@ -1,9 +1,0 @@
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/AccountCollection.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/AccountDAO.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/communication/AccountMVCController.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/Account.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/AccountApplication.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/AccountDTO.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/AccountController.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/AccountJPARepository.java
-/Users/albertins/workspaceMicroservices/3-account-service-discovery/src/main/java/br/ufrpe/dc/qualiti/banking/model/account/IAccountRepository.java
