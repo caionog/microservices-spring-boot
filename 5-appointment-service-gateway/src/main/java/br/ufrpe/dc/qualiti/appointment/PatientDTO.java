@@ -11,4 +11,5 @@ public class PatientDTO {
         private Long id;
         private String name;
         private String cpf;
+        private String email;
 }

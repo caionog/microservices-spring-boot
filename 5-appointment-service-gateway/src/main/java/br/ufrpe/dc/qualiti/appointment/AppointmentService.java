@@ -2,8 +2,11 @@ package br.ufrpe.dc.qualiti.appointment;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -12,23 +15,26 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AppointmentService {
 
     private final AppointmentRepository repository;
     private final DoctorClient doctorClient;
     private final PatientClient patientClient;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     public AppointmentResponseDTO create(AppointmentRequestDTO request) {
-        // 1. Validar se o Médico existe
+        DoctorDTO doctor;
+        PatientDTO patient;
         try {
-            doctorClient.getDoctorById(request.getDoctorId());
+            doctor = doctorClient.getDoctorById(request.getDoctorId());
         } catch (FeignException.NotFound ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found");
         }
 
-        // 2. Validar se o Paciente existe
         try {
-            patientClient.getPatientById(request.getPatientId());
+            patient = patientClient.getPatientById(request.getPatientId());
         } catch (FeignException.NotFound ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found");
         }
@@ -57,6 +63,23 @@ public class AppointmentService {
         entity.setStatus(AppointmentStatus.SCHEDULED);
 
         Appointment saved = repository.save(entity);
+
+        // Publica evento após persistir; listener envia notificação pós-commit
+        AppointmentCreatedEvent event = new AppointmentCreatedEvent(
+            saved.getId(),
+            doctor.getId(),
+            doctor.getName(),
+            patient.getId(),
+            patient.getName(),
+            patient.getEmail(),
+            saved.getAppointmentDate(),
+            saved.getReason()
+        );
+        log.info("📤 Publishing AppointmentCreatedEvent for ID {} to patient email: {}", 
+            saved.getId(), patient.getEmail());
+        eventPublisher.publishEvent(event);
+        log.info("✅ AppointmentCreatedEvent published successfully");
+
         return AppointmentResponseDTO.from(saved);
     }
 

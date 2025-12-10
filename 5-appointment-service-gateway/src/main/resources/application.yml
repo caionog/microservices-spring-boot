@@ -24,3 +24,29 @@ eureka:
       defaultZone: http://discovery:8761/eureka/
   instance:
     instance-id: ${spring.application.name}:${server.port}
+
+# Resiliência e timeouts para integração de notificação
+resilience4j:
+  circuitbreaker:
+    instances:
+      notification:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        ignoreExceptions:
+          - org.springframework.web.server.ResponseStatusException
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+
+logging:
+  level:
+    br.ufrpe.dc.qualiti.appointment: DEBUG
+    org.springframework.transaction.event: DEBUG

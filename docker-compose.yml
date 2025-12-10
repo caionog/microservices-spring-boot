@@ -50,16 +50,6 @@ services:
             postgres:
                 condition: service_healthy
         restart: unless-stopped
-    account:
-        build:
-            context: ./4-account-service-gateway/
-        depends_on:
-            - discovery
-    transaction:
-        build:
-            context: ./4-transaction-service-gateway/
-        depends_on:
-             - discovery
     patients:
         build:
             context: ./4-patients-service-gateway/
@@ -88,6 +78,18 @@ services:
                  condition: service_started
              mysql:
                  condition: service_healthy
+        restart: on-failure
+    notification:
+        build:
+            context: ./6-notification-service/
+        environment:
+            MAIL_USERNAME: "caionogcordeiro@gmail.com"
+            MAIL_PASSWORD: "ixqp ggam qxql emxj"
+        ports:
+             - "8087:8087"
+        depends_on:
+             discovery:
+                 condition: service_started
         restart: on-failure
     discovery:
         build:
