@@ -78,6 +78,17 @@ services:
              mysql:
                  condition: service_healthy
         restart: on-failure
+    appointment:
+        build:
+            context: ./5-appointment-service-gateway/
+        ports:
+             - "8086:8086"
+        depends_on:
+             discovery:
+                 condition: service_started
+             mysql:
+                 condition: service_healthy
+        restart: on-failure
     discovery:
         build:
             context: ./3-service-discovery/
