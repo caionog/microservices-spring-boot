@@ -24,24 +24,24 @@ public class DoctorsController {
     }
 
     @GetMapping
-    public List<Doctor> list() {
+    public List<DoctorResponseDTO> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public Doctor getById(@PathVariable Long id) {
+    public DoctorResponseDTO getById(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Doctor create(@RequestBody Doctor doctor) {
-        return service.create(doctor);
+    public DoctorResponseDTO create(@RequestBody DoctorRequestDTO request) {
+        return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public Doctor update(@PathVariable Long id, @RequestBody Doctor doctor) {
-        return service.update(id, doctor);
+    public DoctorResponseDTO update(@PathVariable Long id, @RequestBody DoctorRequestDTO request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")

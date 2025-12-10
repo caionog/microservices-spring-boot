@@ -2,17 +2,7 @@ package br.ufrpe.dc.qualiti.patients;
 
 import java.time.LocalDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-@Entity
-public class Patient {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PatientRequestDTO {
 
     private String name;
     private String email;
@@ -20,23 +10,15 @@ public class Patient {
     private String cpf;
     private LocalDate birthDate;
 
-    public Patient() {
+    public PatientRequestDTO() {
     }
 
-    public Patient(String name, String email, String phone, String cpf, LocalDate birthDate) {
+    public PatientRequestDTO(String name, String email, String phone, String cpf, LocalDate birthDate) {
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.cpf = cpf;
         this.birthDate = birthDate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
