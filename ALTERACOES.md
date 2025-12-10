@@ -25,7 +25,7 @@
 - Reduzir escopo para entrega: concentrar em agendamento + notificacao por e-mail.
 - Limite de hardware: compartilhamento de MySQL em vez de instancias/bases separadas.
 
-## Trabalho futuro sugerido
+## Trabalhos futuros
 - Implementar verificacao de disponibilidade de medico (HorarioService) antes do agendamento.
 - Adicionar consultas/relatorios (por medico/dia, filtros) e status de notificacao na entidade consulta.
 - Expandir notificacoes para SMS/WhatsApp (Twilio).
