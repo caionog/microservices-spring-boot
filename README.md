@@ -6,9 +6,11 @@ Sistema distribuído com microserviços utilizando Spring Boot, Eureka Discovery
 
 - **Discovery Server (Eureka)**: Service Discovery na porta 8761
 - **Gateway**: API Gateway na porta 8084
-- **Account Service**: Serviço de contas na porta 8081
-- **Transaction Service**: Serviço de transações na porta 8082
-- **Patients Service**: Serviço de pacientes na porta 8085
+- **MySQL Database**: Banco de dados compartilhado na porta 3307
+- **Account Service**: Serviço de contas (acesso via gateway)
+- **Transaction Service**: Serviço de transações (acesso via gateway)
+- **Patients Service**: Serviço de pacientes (acesso via gateway)
+- **Doctors Service**: Serviço de médicos (acesso via gateway)
 
 ## Pré-requisitos
 
@@ -33,6 +35,7 @@ Serviços a compilar:
 - `4-account-service-gateway`
 - `4-transaction-service-gateway`
 - `4-patients-service-gateway`
+- `4-doctors-service-gateway`
 
 **Exemplo:**
 ```powershell
@@ -55,6 +58,10 @@ cd ..
 cd 4-patients-service-gateway
 ./mvnw package spring-boot:repackage -DskipTests
 cd ..
+
+cd 4-doctors-service-gateway
+./mvnw package spring-boot:repackage -DskipTests
+cd ..
 ```
 
 ### 2. Subir os containers com Docker
@@ -72,11 +79,28 @@ docker-compose up --build -d
 - **Eureka Dashboard**: http://localhost:8761
 - **Gateway**: http://localhost:8084
 - **Patients Service (via Gateway)**: http://localhost:8084/patients
+- **Doctors Service (via Gateway)**: http://localhost:8084/doctors
 
-### 4. Parar os containers
+**Nota**: Os serviços individuais não são acessíveis diretamente - todo o tráfego passa pelo Gateway (arquitetura de microserviços).
+
+### 4. Acessar o banco de dados MySQL
+
+Use qualquer cliente MySQL (DBeaver, MySQL Workbench, etc.):
+- **Host**: localhost
+- **Port**: 3307
+- **Database**: microservices
+- **Username**: root
+- **Password**: root
+
+### 5. Parar os containers
 
 ```powershell
 docker-compose down
+```
+
+**Para remover também os dados do MySQL:**
+```powershell
+docker-compose down -v
 ```
 
 ## Estrutura do Projeto
@@ -86,9 +110,17 @@ docker-compose down
 ├── 4-service-gateway/            # Spring Cloud Gateway
 ├── 4-account-service-gateway/    # Serviço de Contas
 ├── 4-transaction-service-gateway/# Serviço de Transações
-├── 4-patients-service-gateway/   # Serviço de Pacientes
-└── docker-compose.yml            # Orquestração dos containers
+├── 4-patients-service-gateway/   # Serviço de Pacientes (MySQL)
+├── 4-doctors-service-gateway/    # Serviço de Médicos (MySQL)
+└── docker-compose.yml            # Orquestração dos containers + MySQL
 ```
+
+## Segurança e Boas Práticas
+
+- ✅ **Acesso via Gateway**: Todos os serviços são acessíveis apenas através do Gateway (porta 8084)
+- ✅ **MySQL persistente**: Dados persistem entre reinicializações usando Docker volumes
+- ⚠️ **Ambiente de desenvolvimento**: Credenciais hardcoded - não usar em produção
+- ⚠️ **Banco compartilhado**: Patients e Doctors usam o mesmo banco (microservices compartilham tabelas por simplicidade)
 
 ## Troubleshooting
 

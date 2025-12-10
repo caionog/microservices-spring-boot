@@ -1,5 +1,21 @@
 
 services:
+    mysql:
+        image: mysql:8.0
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: microservices
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        ports:
+            - "3307:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        restart: unless-stopped
     account:
         build:
             context: ./4-account-service-gateway/
@@ -14,12 +30,20 @@ services:
         build:
             context: ./4-patients-service-gateway/
         depends_on:
-             - discovery
+             discovery:
+                 condition: service_started
+             mysql:
+                 condition: service_healthy
+        restart: on-failure
     doctors:
         build:
             context: ./4-doctors-service-gateway/
         depends_on:
-             - discovery
+             discovery:
+                 condition: service_started
+             mysql:
+                 condition: service_healthy
+        restart: on-failure
     discovery:
         build:
             context: ./3-service-discovery/
@@ -32,3 +56,9 @@ services:
              - "8084:8084"
         depends_on:
              - account
+             - transaction
+             - patients
+             - doctors
+
+volumes:
+    mysql-data:
