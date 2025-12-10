@@ -111,22 +111,3 @@
 7. Clique "Assign role"
 8. Selecione a role `recepcionista`
 9. Clique "Assign"
-
----
-
-## Passo 6: Exportar o Realm
-
-1. Vá em **Realm Settings** (menu esquerdo)
-2. No canto superior direito, clique em **Action**
-3. Clique em **Partial export**
-4. Na caixa de diálogo, ative:
-   - ✅ Include groups and roles
-   - ✅ Include clients
-5. Clique em **Export**
-6. Salve o arquivo como **`realm-export.json`** na raiz do projeto
-
----
-
-## Próximo Passo
-
-Agora você terá um arquivo `realm-export.json` que será importado automaticamente toda vez que o Docker Compose subir!

@@ -1,0 +1,66 @@
+@startuml
+title Fluxos principais (auth + CRUD + agendamento + notificação)
+
+actor Cliente as C
+participant "API Gateway\n(Spring Cloud Gateway)" as G
+participant "Service Discovery\n(Eureka)" as E
+participant Keycloak as K
+participant "Patients Service" as P
+participant "Doctors Service" as D
+participant "Appointment Service" as A
+participant "Notification Service" as N
+database "MySQL\n(shared schemas)" as M
+queue "SMTP\n(Gmail)" as Q
+
+== Autenticação ==
+C -> K : POST /auth\n(username, password) [síncrono]
+K --> C : {access_token: JWT,\ntoken_type: Bearer} [resposta]
+
+== Listar médicos ==
+C -> G : GET /doctors\n(Authorization: Bearer {token}) [síncrono]
+G -> K : Valida JWT\n(token) [síncrono]
+K --> G : {valid: true,\nclaims: {sub, email}} [resposta]
+G -> E : Resolve rota\n(service: "doctors") [síncrono]
+E --> G : {url: "doctors:8002"} [resposta]
+G -> D : GET /doctors [síncrono]
+D -> M : SELECT * FROM doctors [síncrono]
+D --> G : List<DoctorResponseDTO> [resposta]
+G --> C : 200 OK\n[{id, name, specialty}] [resposta]
+
+== Cadastrar paciente ==
+C -> G : POST /patients\n(PatientRequestDTO:\nname, email, cpf, phone,\nbirthDate) [síncrono]
+G -> K : Valida JWT\n(token) [síncrono]
+K --> G : {valid: true,\nclaims} [resposta]
+G -> E : Resolve rota\n(service: "patients") [síncrono]
+E --> G : {url: "patients:8001"} [resposta]
+G -> P : POST /patients\n(PatientRequestDTO) [síncrono]
+P -> M : INSERT INTO patients\n(name, email, cpf, phone,\nbirthDate) [síncrono]
+P --> G : PatientResponseDTO\n{id, name, email, cpf} [resposta]
+G --> C : 201 Created\n{id, name, email, cpf} [resposta]
+
+== Agendar consulta ==
+C -> G : POST /appointments\n(AppointmentRequestDTO:\ndoctorId, patientId,\nappointmentDate, reason) [síncrono]
+G -> K : Valida JWT\n(token) [síncrono]
+K --> G : {valid: true,\nclaims} [resposta]
+G -> E : Resolve rota\n(service: "appointment") [síncrono]
+E --> G : {url: "appointment:8003"} [resposta]
+G -> A : POST /appointments\n(AppointmentRequestDTO) [síncrono]
+
+group Valida domínio (síncrono)
+  A -> P : Feign GET /patients/{id}\n(patientId) [síncrono]
+  A <-- P : PatientDTO\n{id, name, cpf, email} [resposta]
+  A -> D : Feign GET /doctors/{id}\n(doctorId) [síncrono]
+  A <-- D : DoctorDTO\n{id, name, specialty} [resposta]
+end
+
+A -> M : INSERT INTO appointments\n(doctorId, patientId,\nappointmentDate, reason,\nstatus: SCHEDULED) [síncrono]
+A --> G : AppointmentResponseDTO\n{id, doctorId, patientId,\nappointmentDate, status} [resposta]
+G --> C : 201 Created\n{id, doctorId, patientId,\nappointmentDate, status} [resposta]
+
+group Evento + notificação (ASSÍNCRONO, pós-commit)
+  A ->> A : publica AppointmentCreatedEvent\n(appointmentId, doctorId,\ndoctorName, patientId,\npatientName, patientEmail,\nappointmentDate, reason) [assíncrono]
+  A ->> N : Listener chama NotificationService\n(EmailRequest) [fire-and-forget]
+  N ->> Q : Envia e-mail SMTP\n(to: patientEmail,\nsubject: "Consulta Agendada",\nbody: appointment details) [assíncrono]
+  N -->> A : {success: true}\nou fallback log [opcional]
+end
+@enduml

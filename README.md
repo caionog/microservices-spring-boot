@@ -7,10 +7,10 @@ Sistema distribuído com microserviços utilizando Spring Boot, Eureka Discovery
 - **Discovery Server (Eureka)**: Service Discovery na porta 8761
 - **Gateway**: API Gateway na porta 8084
 - **MySQL Database**: Banco de dados compartilhado na porta 3307
-- **Account Service**: Serviço de contas (acesso via gateway)
-- **Transaction Service**: Serviço de transações (acesso via gateway)
 - **Patients Service**: Serviço de pacientes (acesso via gateway)
 - **Doctors Service**: Serviço de médicos (acesso via gateway)
+- **Appointment Service**: Serviço de agendamentos (via gateway)
+- **Notification Service**: Serviço de e-mail (consumido pelo Appointment)
 
 ## Pré-requisitos
 
@@ -32,10 +32,10 @@ Execute o comando abaixo em cada pasta de serviço que será utilizado:
 Serviços a compilar:
 - `3-service-discovery`
 - `4-service-gateway`
-- `4-account-service-gateway`
-- `4-transaction-service-gateway`
 - `4-patients-service-gateway`
 - `4-doctors-service-gateway`
+- `5-appointment-service-gateway`
+- `6-notification-service`
 
 **Exemplo:**
 ```powershell
@@ -47,19 +47,19 @@ cd 4-service-gateway
 ./mvnw package spring-boot:repackage -DskipTests
 cd ..
 
-cd 4-account-service-gateway
-./mvnw package spring-boot:repackage -DskipTests
-cd ..
-
-cd 4-transaction-service-gateway
-./mvnw package spring-boot:repackage -DskipTests
-cd ..
-
 cd 4-patients-service-gateway
 ./mvnw package spring-boot:repackage -DskipTests
 cd ..
 
 cd 4-doctors-service-gateway
+./mvnw package spring-boot:repackage -DskipTests
+cd ..
+
+cd 5-appointment-service-gateway
+./mvnw package spring-boot:repackage -DskipTests
+cd ..
+
+cd 6-notification-service
 ./mvnw package spring-boot:repackage -DskipTests
 cd ..
 ```
@@ -80,6 +80,7 @@ docker-compose up --build -d
 - **Gateway**: http://localhost:8084
 - **Patients Service (via Gateway)**: http://localhost:8084/patients
 - **Doctors Service (via Gateway)**: http://localhost:8084/doctors
+- **Appointment Service (via Gateway)**: http://localhost:8084/appointments
 
 **Nota**: Os serviços individuais não são acessíveis diretamente - todo o tráfego passa pelo Gateway (arquitetura de microserviços).
 
@@ -108,10 +109,10 @@ docker-compose down -v
 ```
 ├── 3-service-discovery/          # Eureka Discovery Server
 ├── 4-service-gateway/            # Spring Cloud Gateway
-├── 4-account-service-gateway/    # Serviço de Contas
-├── 4-transaction-service-gateway/# Serviço de Transações
 ├── 4-patients-service-gateway/   # Serviço de Pacientes (MySQL)
 ├── 4-doctors-service-gateway/    # Serviço de Médicos (MySQL)
+├── 5-appointment-service-gateway/# Serviço de Agendamentos (MySQL + eventos)
+├── 6-notification-service/       # Serviço de Notificações por e-mail
 └── docker-compose.yml            # Orquestração dos containers + MySQL
 ```
 
@@ -121,6 +122,34 @@ docker-compose down -v
 - ✅ **MySQL persistente**: Dados persistem entre reinicializações usando Docker volumes
 - ⚠️ **Ambiente de desenvolvimento**: Credenciais hardcoded - não usar em produção
 - ⚠️ **Banco compartilhado**: Patients e Doctors usam o mesmo banco (microservices compartilham tabelas por simplicidade)
+
+## Testes rápidos (Postman Desktop ou curl)
+
+Use o Gateway (`http://localhost:8084`). Exemplos:
+
+### 1) Listar médicos
+```bash
+curl -X GET "http://localhost:8084/doctors"
+```
+
+### 2) Listar pacientes
+```bash
+curl -X GET "http://localhost:8084/patients"
+```
+
+### 3) Criar agendamento (gera e-mail)
+```bash
+curl -X POST "http://localhost:8084/appointments" \
+	-H "Content-Type: application/json" \
+	-d '{
+				"patientId": 4,
+				"doctorId": 1,
+				"appointmentDate": "2026-01-20T14:17:00",
+				"reason": "Check-up"
+			}'
+```
+
+Resposta esperada: `201 Created` e e-mail enviado para o paciente cadastrado.
 
 ## Troubleshooting
 

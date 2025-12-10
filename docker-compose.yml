@@ -71,8 +71,6 @@ services:
     appointment:
         build:
             context: ./5-appointment-service-gateway/
-        ports:
-             - "8086:8086"
         depends_on:
              discovery:
                  condition: service_started
@@ -85,8 +83,6 @@ services:
         environment:
             MAIL_USERNAME: "caionogcordeiro@gmail.com"
             MAIL_PASSWORD: "ixqp ggam qxql emxj"
-        ports:
-             - "8087:8087"
         depends_on:
              discovery:
                  condition: service_started
