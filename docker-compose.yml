@@ -81,8 +81,8 @@ services:
         build:
             context: ./6-notification-service/
         environment:
-            MAIL_USERNAME: "caionogcordeiro@gmail.com"
-            MAIL_PASSWORD: "ixqp ggam qxql emxj"
+            MAIL_USERNAME: ${MAIL_USERNAME}
+            MAIL_PASSWORD: ${MAIL_PASSWORD}
         depends_on:
              discovery:
                  condition: service_started
